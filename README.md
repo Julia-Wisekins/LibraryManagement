@@ -4,7 +4,7 @@ Please be advised that this application was developed as part of a programming t
 How to Run –
 Open the solution file named LibraryManagement.sln and hit run.
 
-Task – Using the provided application
+Task –
 1. Book Management:
 * Implement functionality to add, update, and delete books.
 * Each book should have at least the following properties: Title, Author, ISBN, and Availability
