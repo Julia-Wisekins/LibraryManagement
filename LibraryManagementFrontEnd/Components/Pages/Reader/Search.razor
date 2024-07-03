@@ -1,0 +1,103 @@
+﻿@page "/Reader/all"
+@rendermode InteractiveServer
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Inputs
+@using LibraryManagementBackend.Objects
+@inject IRepository<Reader> readerData;
+@inject NavigationManager navigation
+
+<h2>Reader</h2>
+<p>
+    <a href="/Reader/add">Add Reader</a>
+</p>
+
+
+@if (Readers == null)
+{
+    <p><em>@dataSatus</em></p>
+}
+<div class="form-group">
+    <input class="form-control" type="text" placeholder="Search..."
+           @bind="Filter"
+           @onkeydown="FilterReaders"
+           @bind:event="oninput">
+</div>
+
+<table class="table table-striped">
+    <thead class="thead-light">
+        <tr>
+            <th>Name</th>
+            <th>Borrowed Books</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var reader in Readers)
+        {
+            <tr>
+                <td>@reader.Name</td>
+                <td>
+                    <div class="form-group">
+                        <table class="table table-striped">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <th>ISBN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var book in reader.BorrowedBooks)
+                                {
+                                    <tr>
+                                        <td>@book.Title</td>
+                                        <td>@book.Author</td>
+                                        <td>@book.ISBN</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+                <td>
+                    <a href='/reader/view/@reader.Id'>View</a>
+                    <a href='/reader/edit/@reader.Id'>Edit</a>  |
+                    <a href='/reader/delete/@reader.Id'>Remove</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+@code {
+
+    [Parameter]
+    public IEnumerable<Reader> Readers { get; set; } = [];
+    public List<string> ToolbarItems = new List<string>() { "Search" };
+    public string Filter { get; set; }
+
+    private static string loading = "Loading...";
+    private static string notFound = "Readers Not Found";
+
+
+    private string dataSatus = loading;
+
+
+
+    protected override async void OnInitialized()
+    {
+        Readers = await readerData.GetAll();
+        dataSatus = Readers == null || Readers.Count() < 1 ? notFound : string.Empty;
+    }
+    private async void FilterReaders(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            Readers = [];
+            dataSatus = loading;
+            Readers = await readerData.Search(Filter);
+        }
+    }
+}

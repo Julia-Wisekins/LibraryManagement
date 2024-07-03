@@ -1,0 +1,70 @@
+﻿@page "/Reader/Edit/{ReaderId}"
+@rendermode InteractiveServer
+@using LibraryManagementBackend.Objects
+@inject IRepository<Reader> ReaderData;
+@inject NavigationManager navigation
+
+<h2>Edit</h2>
+<h4>Reader</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form>
+            <div class="form-group">
+                <label for="Name" class="control-label">Name</label>
+                <input for="Name" class="form-control" @bind="SelectedReader.Name" />
+            </div>
+            <div class="form-group">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>ISBN</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" @onclick="@(async () => await UpdateReader())" class="btn btn-default" />
+                <input type="submit" value="Cancel" @onclick="@cancel" class="btn" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string ReaderId { get; set; }
+    [Parameter]
+    public Reader SelectedReader { get; set; } = new Reader();
+
+    [Parameter]
+    public Availability ReaderAvalibility { get; set; }
+    bool PopupVisible { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var task = await ReaderData.GetById(int.Parse(ReaderId));
+
+        SelectedReader = task.FirstOrDefault();
+    }
+
+    protected async Task UpdateReader()
+    {
+        if (!ReaderData.Update(SelectedReader))
+        {
+            // error here
+            PopupVisible = true;
+        } else
+        {
+            navigation.NavigateTo("/Reader/all", true);
+        }
+    }
+
+    void cancel()
+    {
+        navigation.NavigateTo("/Reader/all", true);
+    }
+}

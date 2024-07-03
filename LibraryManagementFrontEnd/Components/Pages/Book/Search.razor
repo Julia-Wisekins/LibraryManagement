@@ -1,0 +1,87 @@
+﻿@page "/Book/all"
+@rendermode InteractiveServer
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Inputs
+@using LibraryManagementBackend.Objects
+@inject IRepository<Book> BookData;
+@inject NavigationManager navigation
+
+<h2>Books</h2>
+<p>
+    <a href="/Book/add">Add Book</a>
+</p>
+
+
+
+@if (Books == null)
+{
+    <p><em>@dataSatus</em></p>
+}
+<div class="form-group">
+    <input class="form-control" type="text" placeholder="Search..."
+           @bind="Filter"
+           @onkeydown="FilterBooks"
+           @bind:event="oninput">
+</div>
+
+<table class="table table-striped">
+    <thead class="thead-light">
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>ISBN</th>
+            <th>Availibility</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var book in Books)
+        {
+            <tr>
+                <td>@book.Title</td>
+                <td>@book.Author</td>
+                <td>@book.ISBN</td>
+                <td>@Extensions.GetEnumDescription((Availability)book.Availibility)</td>
+                <td>
+                    <a href='/Book/view/@book.Id'>View</a>
+                    <a href='/Book/edit/@book.Id'>Edit</a>  |
+                    <a href='/Book/delete/@book.Id'>Remove</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+@code {
+
+    [Parameter]
+    public IEnumerable<Book> Books { get; set; } = [];
+    public List<string> ToolbarItems = new List<string>() { "Search" };
+    public string Filter { get; set; }
+
+    private static string loading = "Loading...";
+    private static string notFound = "Books Not Found";
+
+
+    private string dataSatus = loading;
+
+
+
+    protected override async void OnInitialized()
+    {
+        Books = await BookData.GetAll();
+        dataSatus = Books == null || Books.Count() < 1 ? notFound : string.Empty;
+    }
+    private async void FilterBooks(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            Books = [];
+            dataSatus = loading;
+            Books = await BookData.Search(Filter);
+        }
+    }
+}

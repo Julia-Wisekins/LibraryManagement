@@ -1,0 +1,42 @@
+﻿@page "/Reader/Add"
+@rendermode InteractiveServer
+@using LibraryManagementBackend.Objects
+@inject IRepository<Reader> ReaderData;
+@inject NavigationManager Navigation;
+
+<h1>Create</h1>
+<h4>Reader</h4>
+
+<div class="row">
+    <div class="col-md-4">
+        <form>
+            <div class="form-group">
+                <label for="Name" class="control-label">Name</label>
+                <input for="Name" class="form-control" @bind="@Reader.Name" />
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-default" @onclick="@(async () => await AddReader())">Save</button>
+                <button class="btn" @onclick="@cancel">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Reader Reader { get; set; } = new Reader();
+    [Parameter]
+    public Availability ReaderAvalibility { get; set; }
+
+
+    protected async Task AddReader()
+    {
+        ReaderData.Add(Reader);
+        Navigation.NavigateTo("/Reader/all", true);
+    }
+
+    void cancel()
+    {
+        Navigation.NavigateTo("/Reader/all", true);
+    }
+}

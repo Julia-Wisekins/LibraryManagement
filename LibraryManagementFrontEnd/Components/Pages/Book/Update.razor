@@ -1,0 +1,78 @@
+﻿@page "/Book/Edit/{BookId}"
+@rendermode InteractiveServer
+@using LibraryManagementBackend.Objects
+@inject IRepository<Book> BookData;
+@inject NavigationManager navigation
+
+<h2>Edit</h2>
+<h4>Book</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form>
+            <div class="form-group">
+                <label for="Name" class="control-label">Title</label>
+                <input for="Name" class="form-control" @bind="SelectedBook.Title" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Author" class="control-label">Author</label>
+                <input for="Author" class="form-control" @bind="SelectedBook.Author" />
+            </div>
+            <div class="form-group">
+                <label asp-for="ISBN" class="control-label">ISBN</label>
+                <input asp-for="ISBN" class="form-control" @bind="SelectedBook.ISBN" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Availibility" class="control-label">Availibility</label>
+                <select @bind="@BookAvalibility">
+                    @foreach (var value in Enum.GetValues<Availability>())
+                    {
+                        <option value="@value">@value.GetEnumDescription()</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" @onclick="@(async () => await UpdateBook())" class="btn btn-default" />
+                <input type="submit" value="Cancel" @onclick="@cancel" class="btn" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string BookId { get; set; }
+    [Parameter]
+    public Book SelectedBook { get; set; } = new Book();
+
+    [Parameter]
+    public Availability BookAvalibility { get; set; }
+    bool PopupVisible { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var task = await BookData.GetById(int.Parse(BookId));
+
+        SelectedBook = task.FirstOrDefault();
+        BookAvalibility = SelectedBook.Availibility;
+    }
+
+    protected async Task UpdateBook()
+    {
+        SelectedBook.Availibility = BookAvalibility;
+        if (!BookData.Update(SelectedBook))
+        {
+            // error here
+            PopupVisible = true;
+        } else
+        {
+            navigation.NavigateTo("/Book/all", true);
+        }
+    }
+
+    void cancel()
+    {
+        navigation.NavigateTo("/Book/all", true);
+    }
+}

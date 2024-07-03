@@ -1,0 +1,83 @@
+﻿@page "/Reader/View/{ReaderId}"
+@rendermode InteractiveServer
+@using LibraryManagementBackend.Objects
+@inject IRepository<Reader> ReaderData;
+@inject IRepository<Book> BookData;
+@inject NavigationManager navigation
+
+<h2>Edit</h2>
+<h4>Reader</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form>
+            <div class="form-group">
+                <label for="Name" class="control-label">Name</label>
+                <input for="Name" class="form-control" @bind="SelectedReader.Name" readonly />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Borrow Book" @onclick="@(async () => BorrowBook())" class="btn btn-default" />
+            </div>
+            <div class="form-group">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>ISBN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var book in SelectedReader.BorrowedBooks)
+                        {
+                            <tr>
+                                <td>@book.Title</td>
+                                <td>@book.Author</td>
+                                <td>@book.ISBN</td>
+                                <td>
+                                    <input type="submit" value="Return Book" @onclick="@(async () => await UpdateReader(book.Id))" class="btn btn-default" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string ReaderId { get; set; }
+
+    [Parameter]
+    public Reader SelectedReader { get; set; } = new Reader();
+
+    [Parameter]
+    public Availability ReaderAvalibility { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var task = await ReaderData.GetById(int.Parse(ReaderId));
+
+        SelectedReader = task.FirstOrDefault();
+    }
+
+    private void BorrowBook()
+    {
+        navigation.NavigateTo($"/Reader/{ReaderId}/borrow", true);        
+    }
+
+    protected async Task UpdateReader(int id = -1)
+    {
+        SelectedReader.BorrowedBooks = SelectedReader.BorrowedBooks.Where(x => x.Id != id);
+        ReaderData.Update(SelectedReader);
+        navigation.NavigateTo("/Reader/all", true);
+    }
+
+    void cancel()
+    {
+        navigation.NavigateTo("/Reader/all", true);
+    }
+}

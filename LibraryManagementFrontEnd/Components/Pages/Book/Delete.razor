@@ -1,0 +1,58 @@
+﻿@page "/Book/delete/{BookId}"
+@rendermode InteractiveServer
+@using LibraryManagementBackend.Objects
+@inject IRepository<Book> BookData;
+@inject NavigationManager Navigation;
+
+<h2>Remove Book</h2>
+<h3>Are you sure you want to Remove @SelectedBook.Title By @SelectedBook.Author ? </h3>
+<br />
+
+<div class="col-md-4">
+    <table class="table">
+        <tr>
+            <td>Name</td>
+            <td>@SelectedBook.Title</td>
+        </tr>
+        <tr>
+            <td>Designation</td>
+            <td>@SelectedBook.Author</td>
+        </tr>
+        <tr>
+            <td>ISBN</td>
+            <td>@SelectedBook.ISBN</td>
+        </tr>
+    </table>
+    <div class="form-group">
+        <input type="submit" value="Delete" @onclick="@(DeleteBook)" class="btn btn-default" />
+        <input type="submit" value="Cancel" @onclick="@cancel" class="btn" />
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string BookId { get; set; }
+    [Parameter]
+    public Book SelectedBook { get; set; } = new Book();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var task = await BookData.GetById(int.Parse(BookId));
+        SelectedBook = task.FirstOrDefault();
+    }
+
+    protected async Task DeleteBook()
+    {
+        if (SelectedBook == null)
+            return;
+        BookData.Delete(SelectedBook);
+        Navigation.NavigateTo("/Book/all", true);
+    }
+
+    void cancel()
+    {
+        Navigation.NavigateTo("/Book/all", true);
+    }
+
+}

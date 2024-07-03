@@ -1,0 +1,50 @@
+﻿@page "/Reader/delete/{ReaderId}"
+@rendermode InteractiveServer
+@using LibraryManagementBackend.Objects
+@inject IRepository<Reader> ReaderData;
+@inject NavigationManager Navigation;
+
+<h2>Remove Reader</h2>
+<h3>Are you sure you want to Remove @SelectedReader.Name ? </h3>
+<br />
+
+<div class="col-md-4">
+    <table class="table">
+        <tr>
+            <td>Name</td>
+            <td>@SelectedReader.Name</td>
+        </tr>
+    </table>
+    <div class="form-group">
+        <input type="submit" value="Delete" @onclick="@(DeleteReader)" class="btn btn-default" />
+        <input type="submit" value="Cancel" @onclick="@cancel" class="btn" />
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string ReaderId { get; set; }
+    [Parameter]
+    public Reader SelectedReader { get; set; } = new Reader();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var task = await ReaderData.GetById(int.Parse(ReaderId));
+        SelectedReader = task.FirstOrDefault();
+    }
+
+    protected async Task DeleteReader()
+    {
+        if (SelectedReader == null)
+            return;
+        ReaderData.Delete(SelectedReader);
+        Navigation.NavigateTo("/Reader/all", true);
+    }
+
+    void cancel()
+    {
+        Navigation.NavigateTo("/Reader/all", true);
+    }
+
+}
