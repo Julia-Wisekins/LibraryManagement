@@ -43,6 +43,7 @@ Good Practice:
 * Design Patterns used: Singleton, Repository, Mediator
 * Application is abstract and allows for changes to how the objects are managed and allows easy changes to where the objects are stored. Frontend could be changed easily.
 * Has Descriptive Errors
+
 Could be better:
 * More testing could be added to the application. 
 * No feedback on user end has been added.
