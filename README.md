@@ -1,6 +1,13 @@
 # LibraryManagement
 Please be advised that this application was developed as part of a programming test, with a primary focus on demonstrating 'Good' Programming Practices. As a result, the application has been intentionally designed to showcase these practices rather than prioritize functionality typical of a business-oriented application of this scale.
 
+Contains:
+* Dependency injection
+* Encapsulation 
+* Design patterns
+* Unit Tests
+* Comments
+
 How to Run –
 Open the solution file named LibraryManagement.sln and hit run.
 
