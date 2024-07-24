@@ -5,7 +5,7 @@ namespace LibraryManagementBackend
     /// <summary>
     /// Handles communication between the Book and Reader repositories
     /// </summary>
-    internal interface IManagementMediator
+    internal interface IMediator
     {
         /// <summary>
         /// Notifies the repositories of any changes to books

@@ -1,6 +1,6 @@
 ﻿using LibraryManagementBackend.Objects;
-using LibraryManagementBackend.Interface;
 using System.Text;
+using LibraryManagementBackend.Testing;
 
 namespace LibraryManagementBackend.Repositories
 {
@@ -9,8 +9,8 @@ namespace LibraryManagementBackend.Repositories
     /// </summary>
     internal class BookManagement : IManage<Book>
     {
-        List<Book> _books = new List<Book>();
-        IManagementMediator _managementMediator;
+        private List<Book> _books;
+        private IMediator _managementMediator;
         #region Singleton
         private static BookManagement _instance;
 
@@ -30,64 +30,14 @@ namespace LibraryManagementBackend.Repositories
         {
             #region dummyData
             // Some sample data so everything is not empty
-            Book book1 = new Book()
+            _books = LibraryManagementServiceTest.Environment switch
             {
-                Author = "George Orwell",
-                Availibility = Availability.Available,
-                Id = 1,
-                ISBN = "9780451524935",
-                Title = "1984",
+                Environment.Test => LibraryTestEnviormentData.LibraryBooks().ToList(),
+                Environment.Live => new List<Book>(),
+                _ => throw new ArgumentException($"invalid Enviorment: {LibraryManagementServiceTest.Environment}"),
             };
-            Book book2 = new Book()
-            {
-                Author = "J.K. Rowling",
-                Availibility = Availability.Available,
-                Id = 2,
-                ISBN = "9780747532743",
-                Title = "Harry Potter and the Philosopher's Stone",
-            };
-            Book book3 = new Book()
-            {
-                Author = "Harper Lee",
-                Availibility = Availability.Available,
-                Id = 3,
-                ISBN = "9780061120084",
-                Title = "To Kill a Mockingbird",
-            };
-            Book book4 = new Book()
-            {
-                Author = "F. Scott Fitzgerald",
-                Availibility = Availability.Available,
-                Id = 4,
-                ISBN = "9780743273565",
-                Title = "The Great Gatsby",
-            };
-            Book book5 = new Book()
-            {
-                Author = "J.R.R. Tolkien",
-                Availibility = Availability.Available,
-                Id = 5,
-                ISBN = "9780261103573",
-                Title = "The Lord of the Rings",
-            };
-            Book book6 = new Book()
-            {
-                Author = "Jane Austen",
-                Availibility = Availability.Available,
-                Id = 6,
-                ISBN = "9780141439518",
-                Title = "Pride and Prejudice",
-            };
-
-
-            _books.Add(book1);
-            _books.Add(book2);
-            _books.Add(book3);
-            _books.Add(book4);
-            _books.Add(book5);
-            _books.Add(book6);
             #endregion
-            _managementMediator = LibraryManagementService.GetManagementMediator();
+            _managementMediator = LibraryManagementServiceTest.GetManagementMediator();
         }
         #endregion
 
@@ -147,8 +97,12 @@ namespace LibraryManagementBackend.Repositories
         {
 
             Book bookToUpdate = _books.FirstOrDefault(x => x.Id == entity.Id);
+            if(bookToUpdate == null)
+            {
+                throw new ArgumentException("Failed to find book inside of repository");
+            }
             await Validate(entity, false);
-            
+
             bookToUpdate.Title = entity.Title;
             bookToUpdate.Author = entity.Author;
             bookToUpdate.ISBN = entity.ISBN;

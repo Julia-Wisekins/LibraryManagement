@@ -1,13 +1,14 @@
 ﻿using LibraryManagementBackend.Objects;
-using LibraryManagementBackend.Interface;
 using System.Text;
+using LibraryManagementBackend.Testing;
 
 namespace LibraryManagementBackend.Repositories
 {
     internal class ReaderManagement : IManage<Reader>
-    {
-        List<Reader> _readers = new List<Reader>();
-        IManagementMediator _managementMediator;
+    {        
+        private List<Reader> _readers = new List<Reader>();
+        private IMediator _managementMediator;
+
         #region Singleton
         private static ReaderManagement _instance;
 
@@ -23,28 +24,28 @@ namespace LibraryManagementBackend.Repositories
                 return _instance;
             }
         }
+        public static ReaderManagement TestInstance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new ReaderManagement();
+
+                    _instance.Init();
+                }
+                return _instance;
+            }
+        }
         private void Init()
         {
-            var reader1 = new Reader
+            _readers = LibraryManagementServiceTest.Environment switch
             {
-                Id = 1,
-                Name = "Aragorn Elessar",
+                Environment.Test => LibraryTestEnviormentData.LibraryReaders().ToList(),
+                Environment.Live => [],
+                _ => throw new ArgumentException($"invalid Enviorment: {LibraryManagementServiceTest.Environment}"),
             };
-            var reader2 = new Reader
-            {
-                Id = 2,
-                Name = "Lyra Silvertongue",
-            };
-            var reader3 = new Reader
-            {
-                Id = 3,
-                Name = "Eragon Shadeslayer",
-            };
-
-            _readers.Add(reader1);
-            _readers.Add(reader2);
-            _readers.Add(reader3);
-            _managementMediator = LibraryManagementService.GetManagementMediator();
+            _managementMediator = LibraryManagementServiceTest.GetManagementMediator();
         }
         #endregion
 

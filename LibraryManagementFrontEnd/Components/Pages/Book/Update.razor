@@ -61,14 +61,16 @@
     protected async Task UpdateBook()
     {
         SelectedBook.Availibility = BookAvalibility;
-        if (!BookData.Update(SelectedBook))
+        try 
         {
-            // error here
-            PopupVisible = true;
-        } else
-        {
+            await BookData.Update(SelectedBook);
             navigation.NavigateTo("/Book/all", true);
         }
+        catch(Exception){
+            // error here
+            PopupVisible = true;
+        } 
+        
     }
 
     void cancel()

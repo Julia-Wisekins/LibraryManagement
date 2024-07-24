@@ -1,10 +1,10 @@
 ﻿using LibraryManagementBackend.Objects;
-using LibraryManagementBackend.Interface;
 using LibraryManagementBackend.Repositories;
+using LibraryManagementBackend.Testing;
 
 namespace LibraryManagementBackend
 {
-    internal class ManagementMediator : IManagementMediator
+    internal class ManagementMediator : IMediator
     {
         private IManage<Book> Books { get; set; }
         private IManage<Reader> Readers { get; set; }
@@ -32,8 +32,8 @@ namespace LibraryManagementBackend
         /// </summary>
         private void Init()
         {
-            Books = LibraryManagementService.GetBookManager();
-            Readers = LibraryManagementService.GetReaderManager();
+            Books = LibraryManagementServiceTest.GetBookManager();
+            Readers = LibraryManagementServiceTest.GetReaderManager();
         }
 
         /// <inheritdoc/>
@@ -42,7 +42,7 @@ namespace LibraryManagementBackend
             if (sender == Books)
             {
                 Readers.UpdateBorrowState(book, state, sender);
-            } 
+            }
             else if (sender == Readers)
             {
                 Books.UpdateBorrowState(book, state, sender);

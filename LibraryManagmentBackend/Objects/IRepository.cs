@@ -40,5 +40,6 @@
         /// <param name="search">The pattern that you are search for</param>
         /// <returns>A subset of all the <see cref="T"/> inside the repository</returns>
         public Task<IEnumerable<T>> Search(string search);
+
     }
 }

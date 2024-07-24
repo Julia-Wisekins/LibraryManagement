@@ -53,14 +53,17 @@
 
     protected async Task UpdateReader()
     {
-        if (!ReaderData.Update(SelectedReader))
+        try
         {
-            // error here
-            PopupVisible = true;
-        } else
-        {
+            await ReaderData.Update(SelectedReader);
             navigation.NavigateTo("/Reader/all", true);
         }
+        catch(Exception){
+        // error here
+            PopupVisible = true;
+        }
+            
+        
     }
 
     void cancel()
